@@ -1,35 +1,13 @@
 package main;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Initial state with 3 couples: " + "\n");
-        System.out.println(initState(3));
-        System.out.println("\n" + "And the hard-coded final state with 5 couples: " + "\n");
-        State generatedFinalState = finalState(5);
-        System.out.println(generatedFinalState);
-        System.out.println("\n" + "Let's test our verification method we implemented to validate the final state: ");
-        System.out.println(isStateFinal(generatedFinalState));
-        Male m1 = new Male(0);
-        Male m2 = new Male(1);
-        Female f1 = new Female(0);
-        Female f2 = new Female(1);
-        System.out.println(transition(initState(3),m1,f1));//after transition state
-        System.out.println(validate(initState(2),m1,m2));
-    }
-
-    // This function is only to test our verification method, since we haven't YET implemented any algorithms to progress further starting from the initial state
-    public static State finalState(int couplesNum) {
-        List<Male> initialMales = new LinkedList<>();
-        List<Female> initialFemales = new LinkedList<>();
-        for (int i = 0; i < couplesNum; i++) {
-            initialMales.add(new Male(i));
-            initialFemales.add(new Female(i));
-        }
-        return new State(new LinkedList<>(), new LinkedList<>(), false, initialMales, initialFemales);
+        //System.out.println(computeAllTransitions(initState(2)));
+        //System.out.println(BFS(initState(2)));
+        System.out.println(BackTracking(new LinkedList<>(),initState(2)));
     }
 
     public static State initState(int couplesNum) {
@@ -46,195 +24,174 @@ public class Main {
         return state.getLeftMales().isEmpty() && state.getLeftFemales().isEmpty() && !state.isBoatLeft();
     }
 
-    public static State transition(State state,Person p1,Person p2)
-    {   List<Male> newLeftMales=state.getLeftMales();
-        List<Male> newRightMales=state.getRightMales();
-        List<Female> newLeftFemales=state.getLeftFemales();
-        List<Female> newRightFemales=state.getRightFemales();
-        if(p1!=null) {
-            if (p1.isMale()) {
-                if(state.isBoatLeft())
-                {newLeftMales.removeIf(i -> i.getIndex() == p1.getIndex());
-                newRightMales.add((Male) p1);}
-                else
-                {
-                    newRightMales.removeIf(i -> i.getIndex() == p1.getIndex());
-                    newLeftMales.add((Male) p1);
-                }
-            } else {
-                if(state.isBoatLeft()) {
-                    newLeftFemales.removeIf(i -> i.getIndex() == p1.getIndex());
-                    newRightFemales.add((Female) p1);
-                }
-                else
-                {
-                    newRightFemales.removeIf(i -> i.getIndex() == p1.getIndex());
-                    newLeftFemales.add((Female) p1);
-                }
-            }
+    public static State transition(State state, Person p1, Person p2) {
+        List<Male> newLeftMales = new ArrayList<>(state.getLeftMales());
+        List<Male> newRightMales = new ArrayList<>(state.getRightMales());
+        List<Female> newLeftFemales = new ArrayList<>(state.getLeftFemales());
+        List<Female> newRightFemales = new ArrayList<>(state.getRightFemales());
+        if (p1 == null && p2 == null) {
+            System.out.println("No persons moved! Returning state as it is!");
+            return state;
         }
-        if(p2!=null) {
-            if (p2.isMale()) {
-                if(state.isBoatLeft())
-                {newLeftMales.removeIf(i -> i.getIndex() == p2.getIndex());
-                    newRightMales.add((Male) p2);}
-                else
-                {
-                    newRightMales.removeIf(i -> i.getIndex() == p2.getIndex());
-                    newLeftMales.add((Male) p2);
-                }
-            } else {
-                if(state.isBoatLeft()) {
-                    newLeftFemales.removeIf(i -> i.getIndex() == p2.getIndex());
-                    newRightFemales.add((Female) p2);
-                }
-                else
-                {
-                    newRightFemales.removeIf(i -> i.getIndex() == p2.getIndex());
-                    newLeftFemales.add((Female) p2);
-                }
-            }
+        if (p1 != null) {
+            personTransition(state, p1, newLeftMales, newRightMales, newLeftFemales, newRightFemales);
         }
-        return new State(newLeftMales,newLeftFemales,!state.isBoatLeft(),newRightMales,newRightFemales);
+        if (p2 != null) {
+            personTransition(state, p2, newLeftMales, newRightMales, newLeftFemales, newRightFemales);
+        }
+        return new State(newLeftMales, newLeftFemales, !state.isBoatLeft(), newRightMales, newRightFemales);
     }
 
-    public static boolean validate(State state, Person p1, Person p2)
-    {   if(isStateFinal(state)) return false; // no need to transit from final state to another
-        if(p1==null && p2==null) return false; // at least one should navigate the boat
-        if(p1!=null && p2!=null) {
-            if (p1.getIndex() == p2.getIndex() && p1.isMale() == p2.isMale()) return false; // p1 != p2
+    private static void personTransition(State state, Person p, List<Male> LeftMales, List<Male> RightMales, List<Female> LeftFemales, List<Female> RightFemales) {
+        if (p.isMale()) {
+            if (state.isBoatLeft()) {
+                LeftMales.remove((Male) p);
+                RightMales.add((Male) p);
+            } else {
+                RightMales.remove((Male) p);
+                LeftMales.add((Male) p);
+            }
+        } else {
+            if (state.isBoatLeft()) {
+                LeftFemales.remove((Female) p);
+                RightFemales.add((Female) p);
+            } else {
+                RightFemales.remove((Female) p);
+                LeftFemales.add((Female) p);
+            }
+        }
+    }
 
+    public static boolean validate(State state, Person p1, Person p2) {
+        if (isStateFinal(state)) return false;
+        if (p1 == null && p2 == null) return false;
+        if (p1 != null && p2 != null) {
+            if (p1.getIndex() == p2.getIndex() && p1.isMale() == p2.isMale()) return false;
             if (p1.isMale()) {
                 if (!p2.isMale()) {
-                    return p1.getIndex() == p2.getIndex(); // pairs can travel on the boat together , but a woman cannot travel with another man
-                } else { //ambii barbati in barca
+                    return p1.getIndex() == p2.getIndex();
+                } else {
                     if (state.getLeftMales().size() + state.getRightMales().size() != 2) {
-                        int ok = 0;
+                        int femalesNumber = 0;
                         for (Female f : state.getLeftFemales()) {
-                            if (f.getIndex() == p1.getIndex() || f.getIndex() == p2.getIndex()) ok++;
+                            if (f.getIndex() == p1.getIndex() || f.getIndex() == p2.getIndex()) femalesNumber++;
                         }
-                        return ok == 0 || ok == 2; //0 daca nu le am gasit pe malul stang , 2 daca le am gasit
-                        //ambele femei ale lor pe acelasi mal
-                        //caz special n=2
-                    } else return true; //daca sunt 2 cupluri , barbatii pot merge oricand impreuna
-
+                        return femalesNumber == 0 || femalesNumber == 2;
+                    } else return true;
                 }
             } else {
                 if (p2.isMale()) {
-                    return p1.getIndex() == p2.getIndex();// pairs can travel on the boat together , but a woman cannot travel with another man
-                } else {   //ambele femei in barca
-                    if (state.isBoatLeft())
-                    // pe malul celalalt nu trebuie sa fie barbati ( exceptie a lor )
-                    {
+                    return p1.getIndex() == p2.getIndex();
+                } else {
+                    if (state.isBoatLeft()) {
                         for (Male i : state.getRightMales()) {
                             if (i.getIndex() != p1.getIndex() && i.getIndex() != p2.getIndex()) return false;
                         }
-                        return true;
                     } else {
                         for (Male i : state.getLeftMales()) {
                             if (i.getIndex() != p1.getIndex() && i.getIndex() != p2.getIndex()) return false;
                         }
-                        return true;
+                    }
+                    return true;
+                }
+            }
+        } else return singlePersonValidation(state, Objects.requireNonNullElse(p1, p2));
+    }
+
+    private static boolean singlePersonValidation(State state, Person p) {
+        if (!p.isMale()) {
+            if (state.isBoatLeft()) {
+                for (Male m : state.getRightMales()) {
+                    if (m.getIndex() != p.getIndex()) return false;
+                }
+            } else {
+                for (Male m : state.getLeftMales()) {
+                    if (m.getIndex() != p.getIndex()) return false;
+                }
+            }
+        } else {
+            if (state.isBoatLeft()) {
+                for (Female f : state.getLeftFemales()) {
+                    if (f.getIndex() == p.getIndex()) {
+                        return state.getLeftMales().size() == 1;
+                    }
+                }
+            } else {
+                for (Female f : state.getRightFemales()) {
+                    if (f.getIndex() == p.getIndex()) {
+                        return state.getRightMales().size() == 1;
                     }
                 }
             }
         }
-        else if(p1 != null)
-            {
-                if(!p1.isMale())
-                {
-                    if(state.isBoatLeft())
-                    {
-                        for(Male m : state.getRightMales())
-                        {
-                            if(m.getIndex()!=p1.getIndex()) return false;   // can go on the other side if there are no men , except his husband
-                        }
-                    }
-                    else
-                    {
-                        for(Male m : state.getLeftMales())
-                        {
-                            if(m.getIndex()!=p1.getIndex()) return false;
-                        }
-                    }
-                    return true;
-
-                }
-                else
-                {
-                    if(state.isBoatLeft())
-                    {
-                        for(Female f : state.getLeftFemales())
-                        {
-                            if(f.getIndex()==p1.getIndex()) // can go on the other side if there are no men , except his husband
-                            {
-                                return state.getLeftMales().size() == 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for(Female f : state.getRightFemales())
-                        {
-                            if(f.getIndex()==p1.getIndex()) // can go on the other side if there are no men , except his husband
-                            {
-                                return state.getRightMales().size() == 1;
-                            }
-                        }
-                    }
-                    return true;
-
-                }
-            }
-            else
-            {
-                if(!p2.isMale())
-                {
-                    if(state.isBoatLeft())
-                    {
-                        for(Male m : state.getRightMales())
-                        {
-                            if(m.getIndex()!=p2.getIndex()) return false;   // can go on the other side if there are no men , except his husband
-                        }
-                    }
-                    else
-                    {
-                        for(Male m : state.getLeftMales())
-                        {
-                            if(m.getIndex()!=p2.getIndex()) return false;
-                        }
-                    }
-                    return true;
-
-                }
-                else
-                {
-                    if(state.isBoatLeft())
-                    {
-                        for(Female f : state.getLeftFemales())
-                        {
-                            if(f.getIndex()==p2.getIndex()) // can go on the other side if there are no men , except his husband
-                            {
-                                return state.getLeftMales().size() == 1;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for(Female f : state.getRightFemales())
-                        {
-                            if(f.getIndex()==p2.getIndex()) // can go on the other side if there are no men , except his husband
-                            {
-                                return state.getRightMales().size() == 1;
-                            }
-                        }
-                    }
-                   return true;
-                }
-            }
-
+        return true;
     }
 
+    public static List<State> BackTracking(List<State> visited, State currentState) {
+        if (isStateFinal(currentState))
+            return visited;
+        for (State s : computeAllTransitions(currentState)) {
+            if (!visited.contains(s)) {
+                visited.add(s);
+                List<State> solution = BackTracking(visited, s);
+                return solution;
+                //visited.remove(s);
+            }
+        }
+        return null;
+    }
 
+    public static List<State> BFS(State initState) {
+        Map<State, State> predecessors = new HashMap<>();
+        List<State> visitedStates = new LinkedList<>();
+        List<State> queue = new LinkedList<>();
+        visitedStates.add(initState);
+        queue.add(initState);
+        while (!queue.isEmpty()) {
+            State currentState = queue.get(0);
+            queue.remove(currentState);
+            for (State s : computeAllTransitions(currentState)) {
+                if (!visitedStates.contains(s)) {
+                    visitedStates.add(s);
+                    queue.add(s);
+                    predecessors.put(s, currentState);
+                    if (isStateFinal(s)) {
+                        System.out.println("Solution found!...\n");
+                        List<State> solution = new LinkedList<>();
+                        State toBeAddedState = s;
+                        while (!predecessors.get(toBeAddedState).equals(initState)) {
+                            solution.add(toBeAddedState);
+                            toBeAddedState = predecessors.get(toBeAddedState);
+                        }
+                        solution.add(initState);
+                        return solution;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
+    private static List<State> computeAllTransitions(State beginning) {
+        List<State> possibleStates = new LinkedList<>();
+        List<Person> allPersons = new LinkedList<>();
+        if (beginning.isBoatLeft()) {
+            allPersons.addAll(beginning.getLeftMales());
+            allPersons.addAll(beginning.getLeftFemales());
+        } else {
+            allPersons.addAll(beginning.getRightFemales());
+            allPersons.addAll(beginning.getRightMales());
+        }
+        for (int i = 0; i < allPersons.size() - 1; i++) {
+            for (int j = i + 1; j < allPersons.size(); j++) {
+                if (validate(beginning, allPersons.get(i), allPersons.get(j)) && !possibleStates.contains(transition(beginning, allPersons.get(i), allPersons.get(j))))
+                    possibleStates.add(transition(beginning, allPersons.get(i), allPersons.get(j)));
+                if (validate(beginning, null, allPersons.get(j)) && !possibleStates.contains(transition(beginning, null, allPersons.get(j))))
+                    possibleStates.add(transition(beginning, null, allPersons.get(j)));
+                if (validate(beginning, allPersons.get(i), null) && !possibleStates.contains(transition(beginning, allPersons.get(i), null)))
+                    possibleStates.add(transition(beginning, allPersons.get(i), null));
+            }
+        }
+        return possibleStates;
+    }
 }

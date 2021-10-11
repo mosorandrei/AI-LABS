@@ -3,6 +3,7 @@ package main;
 public class Person {
     private final int index;
     private boolean isMale;
+
     public Person(int index) {
         this.index = index;
     }

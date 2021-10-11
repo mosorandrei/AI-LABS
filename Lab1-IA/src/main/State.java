@@ -1,6 +1,7 @@
 package main;
 
 import java.util.List;
+import java.util.Objects;
 
 public class State {
     private final boolean isBoatLeft;
@@ -21,16 +22,33 @@ public class State {
         return leftMales;
     }
 
-    public List<Male> getRightMales() { return rightMales; }
+    public List<Male> getRightMales() {
+        return rightMales;
+    }
 
     public List<Female> getLeftFemales() {
         return leftFemales;
     }
 
-    public List<Female> getRightFemales() { return rightFemales; }
+    public List<Female> getRightFemales() {
+        return rightFemales;
+    }
 
     public boolean isBoatLeft() {
         return isBoatLeft;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        State state = (State) o;
+        return isBoatLeft == state.isBoatLeft && Objects.equals(leftMales, state.leftMales) && Objects.equals(leftFemales, state.leftFemales) && Objects.equals(rightMales, state.rightMales) && Objects.equals(rightFemales, state.rightFemales);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isBoatLeft, leftMales, leftFemales, rightMales, rightFemales);
     }
 
     @Override
