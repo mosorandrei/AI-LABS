@@ -43,7 +43,7 @@ public class State {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         State state = (State) o;
-        return isBoatLeft == state.isBoatLeft && Objects.equals(leftMales, state.leftMales) && Objects.equals(leftFemales, state.leftFemales) && Objects.equals(rightMales, state.rightMales) && Objects.equals(rightFemales, state.rightFemales);
+        return isBoatLeft == state.isBoatLeft && leftMales.containsAll(state.getLeftMales()) && state.getLeftMales().containsAll(leftMales) && rightMales.containsAll(state.getRightMales()) && state.getRightMales().containsAll(rightMales) && leftFemales.containsAll(state.getLeftFemales()) && state.getLeftFemales().containsAll(leftFemales) && rightFemales.containsAll(state.getRightFemales()) && state.getRightFemales().containsAll(rightFemales);
     }
 
     @Override

@@ -5,9 +5,9 @@ import java.util.*;
 public class Main {
 
     public static void main(String[] args) {
-        //System.out.println(computeAllTransitions(initState(2)));
-        //System.out.println(BFS(initState(2)));
-        System.out.println(BackTracking(new LinkedList<>(),initState(2)));
+        System.out.println(computeAllTransitions(initState(3)));
+        BFS(initState(3));
+        System.out.println(BackTracking(new LinkedList<>(), initState(4)));
     }
 
     public static State initState(int couplesNum) {
@@ -62,86 +62,44 @@ public class Main {
         }
     }
 
-    public static boolean validate(State state, Person p1, Person p2) {
-        if (isStateFinal(state)) return false;
-        if (p1 == null && p2 == null) return false;
-        if (p1 != null && p2 != null) {
-            if (p1.getIndex() == p2.getIndex() && p1.isMale() == p2.isMale()) return false;
-            if (p1.isMale()) {
-                if (!p2.isMale()) {
-                    return p1.getIndex() == p2.getIndex();
-                } else {
-                    if (state.getLeftMales().size() + state.getRightMales().size() != 2) {
-                        int femalesNumber = 0;
-                        for (Female f : state.getLeftFemales()) {
-                            if (f.getIndex() == p1.getIndex() || f.getIndex() == p2.getIndex()) femalesNumber++;
-                        }
-                        return femalesNumber == 0 || femalesNumber == 2;
-                    } else return true;
-                }
-            } else {
-                if (p2.isMale()) {
-                    return p1.getIndex() == p2.getIndex();
-                } else {
-                    if (state.isBoatLeft()) {
-                        for (Male i : state.getRightMales()) {
-                            if (i.getIndex() != p1.getIndex() && i.getIndex() != p2.getIndex()) return false;
-                        }
-                    } else {
-                        for (Male i : state.getLeftMales()) {
-                            if (i.getIndex() != p1.getIndex() && i.getIndex() != p2.getIndex()) return false;
-                        }
-                    }
-                    return true;
-                }
+    public static boolean validate(State state) {
+        if (isStateFinal(state)) return true;
+        boolean areMenLeft = !state.getLeftMales().isEmpty();
+        for (Female f : state.getLeftFemales()) {
+            if (areMenLeft) {
+                if (!state.getLeftMales().contains(new Male(f.getIndex())))
+                    return false;
             }
-        } else return singlePersonValidation(state, Objects.requireNonNullElse(p1, p2));
-    }
-
-    private static boolean singlePersonValidation(State state, Person p) {
-        if (!p.isMale()) {
-            if (state.isBoatLeft()) {
-                for (Male m : state.getRightMales()) {
-                    if (m.getIndex() != p.getIndex()) return false;
-                }
-            } else {
-                for (Male m : state.getLeftMales()) {
-                    if (m.getIndex() != p.getIndex()) return false;
-                }
-            }
-        } else {
-            if (state.isBoatLeft()) {
-                for (Female f : state.getLeftFemales()) {
-                    if (f.getIndex() == p.getIndex()) {
-                        return state.getLeftMales().size() == 1;
-                    }
-                }
-            } else {
-                for (Female f : state.getRightFemales()) {
-                    if (f.getIndex() == p.getIndex()) {
-                        return state.getRightMales().size() == 1;
-                    }
-                }
+        }
+        boolean areMenRight = !state.getRightMales().isEmpty();
+        for (Female f : state.getRightFemales()) {
+            if (areMenRight) {
+                if (!state.getRightMales().contains(new Male(f.getIndex())))
+                    return false;
             }
         }
         return true;
     }
 
     public static List<State> BackTracking(List<State> visited, State currentState) {
-        if (isStateFinal(currentState))
-            return visited;
+        if (isStateFinal(currentState)) {
+            visited.add(currentState);
+            System.out.println("\n ===== \n BACKTRACKING SOLUTION FOUND - " + visited.size() + " STEPS! \n ===== \n" + visited);
+            return new LinkedList<>(visited);
+        }
+        if (visited.contains(currentState))
+            return new LinkedList<>();
+        visited.add(currentState);
         for (State s : computeAllTransitions(currentState)) {
             if (!visited.contains(s)) {
-                visited.add(s);
-                List<State> solution = BackTracking(visited, s);
-                return solution;
-                //visited.remove(s);
+                BackTracking(visited, s);
+                visited.remove(s);
             }
         }
-        return null;
+        return new LinkedList<>();
     }
 
-    public static List<State> BFS(State initState) {
+    public static void BFS(State initState) {
         Map<State, State> predecessors = new HashMap<>();
         List<State> visitedStates = new LinkedList<>();
         List<State> queue = new LinkedList<>();
@@ -150,26 +108,27 @@ public class Main {
         while (!queue.isEmpty()) {
             State currentState = queue.get(0);
             queue.remove(currentState);
+            if (isStateFinal(currentState)) {
+                System.out.println("\n ===== \n BFS SOLUTION FOUND \n ===== \n");
+                List<State> solution = new LinkedList<>();
+                State toBeAddedState = currentState;
+                while (!predecessors.get(toBeAddedState).equals(initState)) {
+                    solution.add(toBeAddedState);
+                    toBeAddedState = predecessors.get(toBeAddedState);
+                }
+                solution.add(toBeAddedState);
+                solution.add(initState);
+                Collections.reverse(solution);
+                System.out.println(solution);
+            }
             for (State s : computeAllTransitions(currentState)) {
                 if (!visitedStates.contains(s)) {
                     visitedStates.add(s);
                     queue.add(s);
                     predecessors.put(s, currentState);
-                    if (isStateFinal(s)) {
-                        System.out.println("Solution found!...\n");
-                        List<State> solution = new LinkedList<>();
-                        State toBeAddedState = s;
-                        while (!predecessors.get(toBeAddedState).equals(initState)) {
-                            solution.add(toBeAddedState);
-                            toBeAddedState = predecessors.get(toBeAddedState);
-                        }
-                        solution.add(initState);
-                        return solution;
-                    }
                 }
             }
         }
-        return null;
     }
 
     private static List<State> computeAllTransitions(State beginning) {
@@ -184,11 +143,11 @@ public class Main {
         }
         for (int i = 0; i < allPersons.size() - 1; i++) {
             for (int j = i + 1; j < allPersons.size(); j++) {
-                if (validate(beginning, allPersons.get(i), allPersons.get(j)) && !possibleStates.contains(transition(beginning, allPersons.get(i), allPersons.get(j))))
+                if (validate(transition(beginning, allPersons.get(i), allPersons.get(j))) && !possibleStates.contains(transition(beginning, allPersons.get(i), allPersons.get(j))))
                     possibleStates.add(transition(beginning, allPersons.get(i), allPersons.get(j)));
-                if (validate(beginning, null, allPersons.get(j)) && !possibleStates.contains(transition(beginning, null, allPersons.get(j))))
+                if (validate(transition(beginning, null, allPersons.get(j))) && !possibleStates.contains(transition(beginning, null, allPersons.get(j))))
                     possibleStates.add(transition(beginning, null, allPersons.get(j)));
-                if (validate(beginning, allPersons.get(i), null) && !possibleStates.contains(transition(beginning, allPersons.get(i), null)))
+                if (validate(transition(beginning, allPersons.get(i), null)) && !possibleStates.contains(transition(beginning, allPersons.get(i), null)))
                     possibleStates.add(transition(beginning, allPersons.get(i), null));
             }
         }
