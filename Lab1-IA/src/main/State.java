@@ -53,7 +53,7 @@ public class State {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("STATUE STATUS").append("\n");
+        StringBuilder builder = new StringBuilder("\nSTATE STATUS").append("\n");
         builder.append("-------------------").append("\n");
         builder.append("Males from left: ");
         for (Male m : leftMales) {
