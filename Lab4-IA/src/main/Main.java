@@ -16,11 +16,9 @@ public class Main {
                 {1, 0, 1},
                 {1, 1, 0}
         };
-        //regions.get(0).setFinalColor(Color.RED);
-        //regions.get(1).setFinalColor(Color.BLUE);
-        //regions.get(2).setFinalColor(Color.GREEN);
         RegionMap map = new RegionMap(regions,regionMap);
-        map.ForwardChecking(0);
+        System.out.println("Solution for the first example computed with Forward Checking: " + map.ForwardChecking(0));
+        System.out.println("Solution for the first example computed with MRV: " + map.MRV());
 
         List<Region> regionsEx2 = new LinkedList<>();
         regionsEx2.add(new Region(0, "T", new LinkedList<>(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE))));
@@ -41,6 +39,7 @@ public class Main {
                 {1,0,0,1,0,1,0}
         };
         RegionMap map2 = new RegionMap(regionsEx2,regionMapEx2);
-        map2.ForwardChecking(0);
+        System.out.println("Solution for the second example computed with Forward Checking: " + map2.ForwardChecking(0));
+        System.out.println("Solution for the second example computed with MRV: " + map2.MRV());
     }
 }

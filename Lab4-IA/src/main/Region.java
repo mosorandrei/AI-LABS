@@ -6,7 +6,7 @@ public class Region {
     private final int index;
     private final String name;
     private Color finalColor = Color.UNDETERMINED;
-    public List<Color> possibleColors;
+    private final List<Color> possibleColors;
 
     public Region(int index, String name, List<Color> possibleColors) {
         this.index = index;
