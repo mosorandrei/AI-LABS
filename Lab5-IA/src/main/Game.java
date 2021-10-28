@@ -65,6 +65,14 @@ public class Game {
         }
     }
 
+    public int compareSequences(List <GamePiece> choice) {
+        int guessed = 0;
+        for(int i = 0 ; i < toBeGuessed.size() ; i++) {
+            if(toBeGuessed.get(i).equals(choice.get(i))) guessed++;
+        }
+        return guessed;
+    }
+
     public GamePiece[] getAllPossibleGamePieces() {
         return allPossibleGamePieces;
     }
