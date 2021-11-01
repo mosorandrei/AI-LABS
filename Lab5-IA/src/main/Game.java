@@ -108,8 +108,4 @@ public class Game {
     public GamePiece[] getAllPossibleGamePieces() {
         return allPossibleGamePieces;
     }
-
-    public List<GamePiece> getToBeGuessed() {
-        return toBeGuessed;
-    }
 }
