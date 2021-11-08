@@ -1,5 +1,6 @@
 package main;
 
+
 import java.util.*;
 
 public class Game {
@@ -14,6 +15,13 @@ public class Game {
     private int m; // number of balls
     private int k; // number of guess sequence
     private GamePiece[] allPossibleGamePieces;
+    private int alpha;
+
+    public List<GamePiece> getToBeGuessed() {
+        return toBeGuessed;
+    }
+
+    private int beta;
 
     public Game() {
         System.out.println("New Game Instance created!");
@@ -62,6 +70,44 @@ public class Game {
         }
         System.out.println("You are out of moves! CPU wins!");
     }
+      // a function to get all the children of a node
+    public List<List<GamePiece>> computeAllChildren(List<GamePiece> list){
+        List<List<GamePiece>> childs = new LinkedList<>();
+        for(int color = 0 ; color<this.m ; color++) {
+            List<GamePiece> temp = new LinkedList<>(list);
+            temp.add(new GamePiece(color));
+            childs.add(temp);
+        }
+        return childs;
+    }
+    public int minimax(List<GamePiece> l,int alpha,int beta,boolean maximizingPlayer) {
+        if(l.size()==this.k) {
+            if(this.k==compareSequences(l))
+            {System.out.println(l);}
+            return compareSequences(l);
+        }
+
+        if(maximizingPlayer) {
+            int maxEval=Integer.MIN_VALUE;
+            for(List<GamePiece> child : computeAllChildren(l)) {
+                int eval=minimax(child,alpha,beta,true);
+                if(maxEval<=eval) maxEval=eval;
+                if(alpha<=eval) alpha=eval;
+                if(beta<=alpha) break;
+            }
+            return maxEval;
+        }
+        else {
+            int minEval=Integer.MAX_VALUE;
+            for(List<GamePiece> child : computeAllChildren(l)) {
+                int eval=minimax(child,alpha,beta,false);
+                if(minEval>=eval) minEval=eval;
+                if(beta>=eval) beta=eval;
+                if(beta<=alpha) break;
+            }
+            return minEval;
+        }
+    }
 
     private boolean verifyFinal() {
         boolean isFinal = true;
@@ -101,6 +147,14 @@ public class Game {
         int guessed = 0;
         for (int i = 0; i < toBeGuessed.size(); i++) {
             if (toBeGuessed.get(i).equals(actuallyGuessed.get(i))) guessed++;
+        }
+        return guessed;
+    }
+
+    public int compareSequences(List<GamePiece> l) {
+        int guessed = 0;
+        for (int i = 0; i < toBeGuessed.size(); i++) {
+            if (l.get(i).equals(toBeGuessed.get(i))) guessed++;
         }
         return guessed;
     }
