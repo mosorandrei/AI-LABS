@@ -15,16 +15,16 @@ public class Game {
     private int m; // number of balls
     private int k; // number of guess sequence
     private GamePiece[] allPossibleGamePieces;
-    private int alpha;
-
-    public List<GamePiece> getToBeGuessed() {
-        return toBeGuessed;
-    }
-
-    private int beta;
+    private int optimalHeuristicResult;
+    private int totalPruningInstances = 0;
+    private int miniMaxGuesses = 0;
 
     public Game() {
         System.out.println("New Game Instance created!");
+    }
+
+    public List<GamePiece> getToBeGuessed() {
+        return toBeGuessed;
     }
 
     public void initGame(int n, int m, int k) {
@@ -39,6 +39,7 @@ public class Game {
         generateAllPossibleGamePieces(n);
         generateRandomSequence();
         System.out.println("The Game has been initialized! Parameters: N = " + n + ", M = " + m + " and K = " + k);
+        System.out.println("OptimalHeuristicResult is " + optimalHeuristicResult);
     }
 
     public void playGame() {
@@ -70,40 +71,44 @@ public class Game {
         }
         System.out.println("You are out of moves! CPU wins!");
     }
-      // a function to get all the children of a node
-    public List<List<GamePiece>> computeAllChildren(List<GamePiece> list){
-        List<List<GamePiece>> childs = new LinkedList<>();
-        for(int color = 0 ; color<this.m ; color++) {
-            List<GamePiece> temp = new LinkedList<>(list);
-            temp.add(new GamePiece(color));
-            childs.add(temp);
-        }
-        return childs;
-    }
-    public int minimax(List<GamePiece> l,int alpha,int beta,boolean maximizingPlayer) {
-        if(l.size()==this.k) {
-            if(this.k==compareSequences(l))
-            {System.out.println(l);}
-            return compareSequences(l);
+
+    public int miniMax(int depth, List<GamePiece> computedList, int alpha, int beta, boolean maximizingPlayer) {
+        if (depth == k) {
+            miniMaxGuesses++;
+            if (compareSequencesHeuristic(computedList) == optimalHeuristicResult) {
+                System.out.println("Solution found using the MiniMax method, with Alpha-Beta pruning! Solution found in " + miniMaxGuesses + " step(s)!...");
+                System.out.println("Total number of pruning optimizations with the Alpha-Beta method: " + totalPruningInstances);
+                System.out.println("Solution is: " + computedList);
+            }
+            return compareSequencesHeuristic(computedList);
         }
 
-        if(maximizingPlayer) {
-            int maxEval=Integer.MIN_VALUE;
-            for(List<GamePiece> child : computeAllChildren(l)) {
-                int eval=minimax(child,alpha,beta,true);
-                if(maxEval<=eval) maxEval=eval;
-                if(alpha<=eval) alpha=eval;
-                if(beta<=alpha) break;
+        if (maximizingPlayer) {
+            int maxEval = Integer.MIN_VALUE;
+            for (GamePiece gamePiece : allPossibleGamePieces) {
+                List<GamePiece> computedListUpdated = new LinkedList<>(computedList);
+                computedListUpdated.add(gamePiece);
+                int eval = miniMax(depth + 1, computedListUpdated, alpha, beta, false);
+                if (maxEval <= eval) maxEval = eval;
+                if (alpha <= maxEval) alpha = maxEval;
+                if (beta <= alpha) {
+                    totalPruningInstances++;
+                    break;
+                }
             }
             return maxEval;
-        }
-        else {
-            int minEval=Integer.MAX_VALUE;
-            for(List<GamePiece> child : computeAllChildren(l)) {
-                int eval=minimax(child,alpha,beta,false);
-                if(minEval>=eval) minEval=eval;
-                if(beta>=eval) beta=eval;
-                if(beta<=alpha) break;
+        } else {
+            int minEval = Integer.MAX_VALUE;
+            for (GamePiece gamePiece : allPossibleGamePieces) {
+                List<GamePiece> computedListUpdated = new LinkedList<>(computedList);
+                computedListUpdated.add(gamePiece);
+                int eval = miniMax(depth + 1, computedListUpdated, alpha, beta, true);
+                if (eval <= minEval) minEval = eval;
+                if (minEval <= beta) beta = minEval;
+                if (beta <= alpha) {
+                    totalPruningInstances++;
+                    break;
+                }
             }
             return minEval;
         }
@@ -141,6 +146,7 @@ public class Game {
                 chooseCount.put(chosen, chosenPieceCount + 1);
             }
         }
+        optimalHeuristicResult = compareSequencesHeuristic(toBeGuessed);
     }
 
     private int compareSequences() {
@@ -151,15 +157,13 @@ public class Game {
         return guessed;
     }
 
-    public int compareSequences(List<GamePiece> l) {
-        int guessed = 0;
+    public int compareSequencesHeuristic(List<GamePiece> l) {
+        int heuristicVal = 0;
         for (int i = 0; i < toBeGuessed.size(); i++) {
-            if (l.get(i).equals(toBeGuessed.get(i))) guessed++;
+            if (l.get(i).equals(toBeGuessed.get(i)))
+                heuristicVal += Math.pow(k,(i+1));
         }
-        return guessed;
+        return heuristicVal;
     }
 
-    public GamePiece[] getAllPossibleGamePieces() {
-        return allPossibleGamePieces;
-    }
 }
