@@ -1,0 +1,24 @@
+ Computer architects use parallelism and various strategies for memory organization to design computing systems with very high performance.
+ Computer architecture requires strong communication between computer scientists and computer engineers , since they both focus fundamentally on hardware design.
+ Britannica Quiz Computers and Technology Quiz Computers host websites composed of HTML and send text messages as simple as ... LOL.
+ Computers also have another level of memory called a cache , a small , extremely fast ( compared with the main memory , or random access memory [ RAM ] ) unit that can be used to store information that is urgently or frequently needed.
+ Current research includes cache design and algorithms that can predict what data is likely to be needed next and preload it into the cache for improved performance.
+ They can be either permanently or temporarily attached to the computer in the form of a compact disc ( CD ) , a digital video disc ( DVD ) , or a memory stick ( also called a flash drive ).
+ The first instruction is transferred from RAM into the control unit and interpreted by the hardware circuitry.
+ Computer architectures that can execute sequences of instructions , conditional instructions , and loops are called “ Turing complete , ” which means that they can carry out the execution of any algorithm that can be defined.
+ An important area related to architecture is the design of microprocessors , which are complete CPUs—control unit , ALU , and memory—on a single integrated circuit chip.
+ VLSI microprocessor design occurs in a number of stages , which include creating the initial functional or behavioral specification , encoding this specification into a hardware description language , and breaking down the design into modules and generating sizes and shapes for the eventual chip components.
+ Computer scientists are also involved in creating the computer-aided design ( CAD ) tools that support engineers in the various stages of chip design and in developing the necessary theoretical results , such as how to efficiently design a floor plan with near-minimal area that satisfies the given constraints.
+ For example , in 1971 the first microprocessor chip ( Intel Corporation ’ s 4004 ) had only 2,300 transistors , in 1993 Intel ’ s Pentium chip had more than 3 million transistors , and by 2000 the number of transistors on such a chip was about 50 million.
+ The phenomenon of the number of transistors in an integrated circuit doubling about every two years is widely known as Moore ’ s law.
+ Computer scientists are involved in the analysis of such replicated systems , providing theoretical approaches to estimating the reliability achieved by a given configuration and processor parameters , such as average time between failures and average time required to repair the processor.
+ For example , an advantage of a distributed database is that data replicated on different network hosts can provide a natural backup mechanism when one host fails.
+ Computational science Computational science applies computer simulation , scientific visualization , mathematical modeling , algorithms , data structures , networking , database design , symbolic computation , and high-performance computing to help advance the goals of various disciplines.
+ The requirements of big-data scientific problems , including the solution of ever larger systems of equations , engage the use of large and powerful arrays of processors ( called multiprocessors or supercomputers ) that allow many calculations to proceed in parallel by assigning them to separate processing elements.
+ Graphics techniques incorporate principles of linear algebra , numerical integration , computational geometry , special-purpose hardware , file formats , and graphical user interfaces ( GUIs ) to accomplish these complex tasks.
+ CAD systems allow the computer to be used for designing objects ranging from automobile parts to bridges to computer chips by providing an interactive drawing tool and an engineering interface to simulation and analysis tools.
+ Medical imaging applications involve the visualization of data obtained from technologies such as X-rays and magnetic resonance imaging ( MRIs ) to assist doctors in diagnosing medical conditions.
+ Scientific visualization uses massive amounts of data to define simulations of scientific phenomena , such as ocean modeling , to produce pictures that provide more insight into the phenomena than would tables of numbers.
+ Both extremely efficient algorithms and state-of-the-art hardware are needed to accomplish real-time animation.
+ HCI occurs at an interface that includes both software and hardware.
+ User interface design impacts the life cycle of software , so it should occur early in the design process.
