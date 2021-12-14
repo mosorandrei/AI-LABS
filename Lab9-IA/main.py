@@ -1,4 +1,5 @@
 import random
+import time
 
 import gym
 import numpy as np
@@ -64,7 +65,8 @@ for episode in range(num_episodes):  # Contains that happens in an episode
 
         # Update Q-table for Q(state,action)
         # Basically, a weighted sum between the sum of the old value and the "learned" value
-        q_table[state, action] = q_table[state, action] * (1 - learning_rate) + learning_rate * (reward + discount_rate * np.max(q_table[new_state, :]))
+        q_table[state, action] = q_table[state, action] * (1 - learning_rate) + learning_rate * (
+                reward + discount_rate * np.max(q_table[new_state, :]))
 
         # Update the current state and update the rewards
         state = new_state
@@ -89,3 +91,34 @@ for r in rewards_per_thousand_episodes:
 # Print the updates Q-Table
 print("\n\n******* Q-Table *******\n")
 print(q_table)
+
+# Training results
+# Get through each step the algorithm takes
+
+for episode in range(5):
+    # Initialize new episode params
+    state = env.reset()
+    done = False
+    print("*******Episode ", episode + 1, "*******\n\n")
+    time.sleep(1)
+    for step in range(max_steps_per_episode):
+        # We render the current environment state for each step of the episode
+        env.render()
+        # Take new action, update variables
+        time.sleep(0.3)
+        action = np.argmax(q_table[state, :])
+        new_state, reward, done, info = env.step(action)
+        if done:
+            env.render()
+            if reward == 1:
+                # Agent reached the goal and won episode
+                print("****You reached the goal****")
+                time.sleep(3)
+            else:
+                # Agent stepped in a hole and lost episode
+                print("****You lost****")
+                time.sleep(3)
+            break
+        # Update state and move on
+        state = new_state
+env.close()
